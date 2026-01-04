@@ -1,0 +1,143 @@
+<% title = product.name %>
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/products">Products</a></li>
+            <li class="breadcrumb-item active" aria-current="page"><%= product.name %></li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <img src="<%= product.image || '/images/product-placeholder.png' %>" 
+                 class="img-fluid rounded shadow-sm" 
+                 alt="<%= product.name %>"
+                 style="max-height: 500px; width: 100%; object-fit: contain;">
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <h1><%= product.name %></h1>
+            
+            <div class="d-flex align-items-center mb-3">
+                <span class="fs-3 text-primary fw-bold me-3">
+                    <%= product.price ? (Number(product.price).toFixed(2) + ' USD') : 'Price unavailable' %>
+                </span>
+                
+                <% if (product.stock > 0) { %>
+                    <span class="badge bg-success">In Stock (<%= product.stock %>)</span>
+                <% } else { %>
+                    <span class="badge bg-danger">Out of Stock</span>
+                <% } %>
+            </div>
+            
+            <% if (product.category) { %>
+                <p class="text-muted"><strong>Category:</strong> <%= product.category.name %></p>
+            <% } %>
+
+            <hr>
+
+            <h3>Description</h3>
+            <p><%= product.description || 'No detailed description available.' %></p>
+
+            <div class="card bg-light mb-4">
+                <div class="card-body">
+                    <% if (product.stock > 0) { %>
+                        <form action="/api/cart/add" method="POST" class="row g-2">
+                            <input type="hidden" name="productId" value="<%= product.id %>">
+                            <div class="col-auto">
+                                <label class="form-label d-block small text-muted">Quantity</label>
+                                <input type="number" name="quantity" value="1" min="1" max="<%= product.stock %>" class="form-control" style="width: 80px;">
+                            </div>
+                            <div class="col-auto d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                                </button>
+                            </div>
+                        </form>
+                    <% } else { %>
+                        <div class="text-center py-2">
+                            <p class="text-danger fw-bold mb-2">This instrument is currently sold out.</p>
+                            <button class="btn btn-secondary w-100" disabled>Sold Out</button>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="/products" class="btn btn-outline-secondary me-2">Back to Products</a>
+                
+                <% if (user && user.role === 'admin') { %>
+                    <a href="/products/<%= product.id %>/edit" class="btn btn-warning me-2">Edit</a>
+                    <form action="/api/products/<%= product.id %>?_method=DELETE" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this product?')">Delete</button>
+                    </form>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-5">
+
+    <div class="row">
+        <div class="col-md-8">
+            <h3 class="mb-4">Customer Reviews</h3>
+            
+            <% if (product.reviews && product.reviews.length > 0) { %>
+                <% product.reviews.forEach(review => { %>
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="card-title mb-1"><strong><%= review.user ? review.user.username : 'Anonymous' %></strong></h6>
+                                <small class="text-muted"><%= new Date(review.createdAt).toLocaleDateString() %></small>
+                            </div>
+                            <div class="text-warning mb-2">
+                                <% for(let i=1; i<=5; i++) { %>
+                                    <%= i <= review.rating ? '★' : '☆' %>
+                                <% } %>
+                            </div>
+                            <p class="card-text"><%= review.comment %></p>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="text-center py-5 bg-light rounded">
+                    <p class="text-muted italic mb-0">No reviews yet. Be the first to share your thoughts!</p>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="col-md-4">
+            <% if (user) { %>
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Leave a Review</h5>
+                        <form action="/products/<%= product.id %>/review" method="POST">
+                            <div class="mb-3">
+                                <label class="form-label">Rating</label>
+                                <select name="rating" class="form-select" required>
+                                    <option value="5">5 Stars - Excellent</option>
+                                    <option value="4">4 Stars - Very Good</option>
+                                    <option value="3">3 Stars - Good</option>
+                                    <option value="2">2 Stars - Fair</option>
+                                    <option value="1">1 Star - Poor</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Your Comment</label>
+                                <textarea name="comment" class="form-control" rows="3" placeholder="How does it sound?" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-dark w-100">Post Review</button>
+                        </form>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info border-0 shadow-sm">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Please <a href="/login" class="alert-link">login</a> to leave a review.
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>

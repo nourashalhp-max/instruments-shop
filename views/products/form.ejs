@@ -1,0 +1,87 @@
+
+<div class="container mt-4">
+    <% if (product) { %>
+        <h1 class="mb-4">Edit Product: <%= product.name %></h1>
+    <% } else { %>
+        <h1 class="mb-4">Create New Product</h1>
+    <% } %>
+
+    <% if (messages.error && messages.error.length > 0) { %>
+    <div class="alert alert-danger" role="alert">
+        <%= messages.error[0] %>
+    </div>
+<% } %>
+<% if (messages.success && messages.success.length > 0) { %>
+    <div class="alert alert-success" role="alert">
+        <%= messages.success[0] %>
+    </div>
+<% } %>
+
+    <% if (product) { %>
+        <form action="/api/products/<%= product.id %>?_method=PUT" method="POST" enctype="multipart/form-data">
+    <% } else { %>
+        <form action="/api/products" method="POST" enctype="multipart/form-data">
+    <% } %>
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Product Name</label>
+            <input type="text" class="form-control" id="name" name="name" 
+                   value="<%= typeof product !== 'undefined' && product ? product.name : '' %>" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="5"><%= typeof product !== 'undefined' && product ? product.description : '' %></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="price" class="form-label">Price</label>
+            <input type="number" step="0.01" class="form-control" id="price" name="price" 
+                   value="<%= typeof product !== 'undefined' && product ? product.price : '' %>" required min="0">
+        </div>
+
+        <div class="mb-3">
+            <label for="stock" class="form-label">Stock Quantity</label>
+            <input type="number" class="form-control" id="stock" name="stock" 
+                   value="<%= typeof product !== 'undefined' && product ? product.stock : '' %>" required min="0">
+        </div>
+
+        <div class="mb-3">
+            <label for="categoryId" class="form-label">Category</label>
+            <select class="form-select" id="categoryId" name="categoryId" required>
+                <option value="">Select a Category</option>
+                <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category.id %>" 
+                                <%= typeof product !== 'undefined' && product && product.categoryId === category.id ? 'selected' : '' %>>
+                            <%= category.name %>
+                        </option>
+                    <% }); %>
+                <% } %>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="productImage" class="form-label">Product Image</label>
+            <input class="form-control" type="file" id="productImage" name="productImage" accept="image/*">
+            <% if (typeof product !== 'undefined' && product && product.imageUrl) { %>
+                <small class="form-text text-muted">Current Image: <a href="<%= product.imageUrl %>" target="_blank">
+                    <%= product.imageUrl.substring(product.imageUrl.lastIndexOf('/') + 1) %>
+                </a></small>
+                <div class="mt-2">
+                    <img src="<%= product.imageUrl %>" alt="Current Product Image" style="max-width: 150px; height: auto;">
+                </div>
+            <% } %>
+            <small class="form-text text-muted">Only images (jpeg, jpg, png, gif) are allowed. Max 5MB.</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <% if (product) { %>
+                Update Product
+            <% } else { %>
+                Create Product
+            <% } %>
+        </button>
+        <a href="/products" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

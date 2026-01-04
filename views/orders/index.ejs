@@ -1,0 +1,75 @@
+<% title = 'My Orders' %>
+
+<div class="container mt-4">
+    <h1 class="mb-5 text-center fw-bold">My Orders</h1>
+    <%- include('../partials/flash') %>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <% if (orders && orders.length > 0) { %>
+                <p class="lead text-muted mb-4">You have **<%= orders.length %>** orders in your history.</p>
+                
+                <% orders.forEach(order => { %>
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-light">
+                            <h5 class="mb-0 fw-bold">Order #<%= order.id %></h5>
+                            <span class="badge rounded-pill 
+                                <% if (order.status === 'Processing') { %>bg-info
+                                <% } else if (order.status === 'Shipped') { %>bg-primary
+                                <% } else if (order.status === 'Delivered') { %>bg-success
+                                <% } else { %>bg-secondary
+                                <% } %>">
+                                <%= order.status %>
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted">Placed on: 
+                                <% if (order.createdAt) { %>
+                                    <%= new Date(order.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+                                <% } else { %>
+                                    Date Missing
+                                <% } %>
+                            </p>
+
+                            <h6 class="mt-3">Items:</h6>
+                            <ul class="list-group list-group-flush mb-3">
+                                <% if (order.OrderItems && order.OrderItems.length > 0) { %>
+                                    <% order.OrderItems.forEach(item => { %>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div class="d-flex align-items-center">
+                                                <img src="<%= item.Product && item.Product.image ? item.Product.image.replace('/uploads/', '/uploads/product_images/') : '/images/product-placeholder.png' %>" alt="Product" style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px;" class="me-3">
+                                                <%= item.Product ? item.Product.name : 'Unknown Product' %>
+                                            </div>
+                                            <span class="text-muted"><%= item.quantity %> x $<%= item.price.toFixed(2) %></span>
+                                        </li>
+                                    <% }); %>
+                                <% } else { %>
+                                     <li class="list-group-item text-danger">No items found for this order.</li>
+                                <% } %>
+                            </ul>
+                            
+                            <div class="d-flex justify-content-end align-items-center mt-3">
+                                <h5 class="me-3 mb-0">Total:</h5>
+                                <h4 class="fw-bold text-warning mb-0">$<%= order.total.toFixed(2) %></h4>
+                            </div>
+
+                        </div>
+                        <div class="card-footer text-end">
+                            <a href="/orders/<%= order.id %>" class="btn btn-sm btn-outline-primary">
+                                View Details <i class="fas fa-info-circle ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                <% }); %>
+            
+            <% } else { %>
+                <div class="alert alert-info text-center shadow" role="alert">
+                    <i class="fas fa-info-circle me-2"></i> You haven't placed any orders yet.
+                </div>
+                <div class="text-center mt-4">
+                    <a href="/products" class="btn btn-warning btn-lg">Start Shopping Now!</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>

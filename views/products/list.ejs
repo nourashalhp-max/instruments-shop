@@ -1,0 +1,86 @@
+<% title = 'Browse Store' %>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <h6 class="text-warning text-uppercase fw-bold mb-1">Our Collection</h6>
+            <h2 class="display-6 fw-bold m-0">All Instruments</h2>
+        </div>
+        <% if (user && user.role === 'admin') { %>
+            <a href="/products/new" class="btn btn-primary rounded-pill"><i class="fas fa-plus me-2"></i>New Product</a>
+        <% } %>
+    </div>
+
+    <div class="row mb-5 g-3">
+        <div class="col-lg-8">
+            <form action="/products" method="GET" class="input-group shadow-sm border rounded-pill overflow-hidden">
+                <span class="input-group-text bg-white border-0 ps-3"><i class="fas fa-search text-muted"></i></span>
+                <input type="text" name="search" class="form-control border-0 py-2" placeholder="Search by name..." value="<%= req.query.search || '' %>">
+                <button type="submit" class="btn btn-dark px-4">Search</button>
+            </form>
+        </div>
+        <div class="col-lg-4 d-flex gap-2">
+            <a href="/products" class="btn btn-outline-secondary rounded-pill flex-grow-1">Reset</a>
+            <% if (user && user.role === 'admin') { %>
+                <a href="/products?lowStock=true" class="btn btn-outline-danger rounded-pill flex-grow-1">Low Stock</a>
+            <% } %>
+        </div>
+    </div>
+
+    <div class="mb-4 d-flex flex-wrap gap-2 justify-content-center">
+        <a href="/products" class="btn btn-sm <%= !currentCategory ? 'btn-warning shadow' : 'btn-light border' %> rounded-pill px-4">All</a>
+        <% if (typeof categories !== 'undefined') { %>
+            <% categories.forEach(cat => { %>
+                <a href="/products?category=<%= cat.id %>" 
+                   class="btn btn-sm <%= (currentCategory && currentCategory.id === cat.id) ? 'btn-warning shadow' : 'btn-light border' %> rounded-pill px-4">
+                    <%= cat.name %>
+                </a>
+            <% }) %>
+        <% } %>
+    </div>
+
+    <div class="row g-4">
+        <% products.forEach(p => { %>
+            <div class="col-sm-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm hover-up overflow-hidden">
+                    <div class="position-relative">
+                        <img src="<%= p.image || '/images/product-placeholder.png' %>" class="card-img-top" style="height: 250px; object-fit: cover;">
+                        <% if (p.stock <= 0) { %>
+                            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.7); backdrop-filter: blur(2px);">
+                                <span class="badge bg-dark px-3 py-2 fs-6">Sold Out</span>
+                            </div>
+                        <% } else if (p.stock <= 3) { %>
+                            <span class="badge bg-warning text-dark position-absolute top-2 end-2 m-3 shadow-sm">Low Stock</span>
+                        <% } %>
+                    </div>
+                    <div class="card-body p-4 d-flex flex-column">
+                        <small class="text-muted text-uppercase fw-bold ls-1"><%= p.category ? p.category.name : 'Uncategorized' %></small>
+                        <h5 class="card-title fw-bold my-2"><%= p.name %></h5>
+                        <h5 class="text-primary fw-bold mb-4">$<%= parseFloat(p.price).toFixed(2) %></h5>
+                        
+                        <div class="mt-auto pt-3 border-top">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="/products/<%= p.id %>" class="btn btn-sm btn-outline-dark rounded-pill px-3">Details</a>
+                                
+                                <% if (user && user.role === 'admin') { %>
+                                    <div class="btn-group">
+                                        <a href="/products/<%= p.id %>/edit" class="btn btn-sm btn-light border"><i class="fas fa-edit"></i></a>
+                                        <form action="/api/products/<%= p.id %>?_method=DELETE" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-light border text-danger" onclick="return confirm('Delete?')"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                <% } else if (user && p.stock > 0) { %>
+                                    <form action="/api/cart/add" method="POST" class="d-inline">
+                                        <input type="hidden" name="productId" value="<%= p.id %>">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn btn-sm btn-warning rounded-pill px-3 shadow-sm">Add to Cart</button>
+                                    </form>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+</div>

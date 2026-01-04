@@ -1,0 +1,37 @@
+<% title = 'Login' %>
+<div class="container py-5">
+    <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+        <div class="col-lg-4 col-md-6">
+            <div class="card shadow-lg border-0 hover-up">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <div class="bg-warning d-inline-block p-3 rounded-circle mb-3 shadow">
+                            <i class="bi bi-lock-fill fs-2 text-white"></i>
+                        </div>
+                        <h2 class="fw-bold">Welcome Back</h2>
+                        <p class="text-muted">Please enter your details</p>
+                    </div>
+
+                    <%- include('../partials/flash') %>
+
+                    <form id="loginForm" action="/api/auth/login" method="POST">
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control border-0 bg-light" id="email" name="email" placeholder="name@example.com" required>
+                            <label for="email">Email address</label>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input type="password" class="form-control border-0 bg-light" id="password" name="password" placeholder="Password" required>
+                            <label for="password">Password</label>
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 py-3 fw-bold text-dark shadow-sm">Login</button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <span class="text-muted small">Don't have an account?</span> 
+                        <a href="/register" class="text-warning fw-bold text-decoration-none small">Register here</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

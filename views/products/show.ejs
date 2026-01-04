@@ -1,0 +1,43 @@
+<% title = product.name %>
+
+<div class="row mt-5">
+    <div class="col-md-6 mb-4">
+        <img src="<%= product.image || '/images/product-placeholder.png' %>" class="img-fluid rounded shadow-lg" alt="<%= product.name %>">
+    </div>
+    
+    <div class="col-md-6">
+        <h1 class="display-5 fw-bold mb-3"><%= product.name %></h1>
+        
+        <% if (product.category && product.category.name) { %>
+            <p class="text-muted"><i class="fas fa-tag me-2"></i>Category: <%= product.category.name %></p>
+        <% } %>
+        
+        <h3 class="fw-bolder text-warning mb-4">
+            <%= product.price ? (product.price.toFixed(2) + ' USD') : 'Not Priced' %>
+        </h3>
+        
+        <hr class="mb-4">
+        
+        <p class="lead"><%= product.description %></p>
+
+        <form action="/api/cart/add" method="post" class="mt-4">
+            <input type="hidden" name="productId" value="<%= product.id %>">
+            
+            <div class="mb-4">
+                <label for="qty" class="form-label fw-bold">Quantity</label>
+                <input name="qty" id="qty" type="number" min="1" value="1" class="form-control" style="width:120px" required>
+            </div>
+            
+            <button type="submit" class="btn btn-warning btn-lg shadow">
+                <i class="fas fa-cart-plus me-2"></i> Add to Cart
+            </button>
+        </form>
+        
+        <% if (product.stock && product.stock > 0) { %>
+            <p class="mt-3 text-success"><i class="fas fa-check-circle me-1"></i> In Stock: <%= product.stock %></p>
+        <% } else { %>
+            <p class="mt-3 text-danger"><i class="fas fa-times-circle me-1"></i> Out of Stock</p>
+        <% } %>
+
+    </div>
+</div>
